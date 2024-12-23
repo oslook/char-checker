@@ -11,7 +11,7 @@ VALID_CHARS = set(
     # Basic symbols and whitespace characters
     " \t\n\r\0\b\x0c"
     # Common punctuation symbols
-    ",.;:!?()[]{}'\"`+-*/%=<>|&@#$^~\\"
+    ",.;:!?()[]{}'\"`+-*/%=<>|&@#$^~\\_"
 )
 
 def is_valid_char(char):
@@ -40,6 +40,10 @@ def is_valid_char(char):
     
     # Check the range of Russian characters (Cyrillic alphabet)
     if (0x0400 <= code_point <= 0x04FF) or (0x0500 <= code_point <= 0x052F):
+        return True
+
+    # Check the range of Emoji
+    if (0x1F600 <= code_point <= 0x1F64F) or (0x1F300 <= code_point <= 0x1F5FF) or (0x1F900 <= code_point <= 0x1F9FF) or (0x1FA70 <= code_point <= 0x1FAFF) or (0x1F400 <= code_point <= 0x1F4FF):
         return True
     
     return False
