@@ -21,14 +21,12 @@
 ## 使用方法
 
 1. 基本用法：
-```
-bash
+```bash
 python invalid_char_checker.py /path/to/your/project
 ```
 
 2. 指定文件類型：
-```
-bash
+```bash
 python invalid_char_checker.py /path/to/your/project -e .py,.java,.c,.cpp,.js,.html,.css,.txt
 ```
 

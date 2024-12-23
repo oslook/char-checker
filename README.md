@@ -22,14 +22,12 @@ This is a Python tool for detecting invalid characters in code files. It support
 ## Usage
 
 1. Basic usage:
-```
-bash
+```bash
 python invalid_char_checker.py /path/to/your/project
 ```
 
 2. Specify the file type:
-```
-bash
+```bash
 python invalid_char_checker.py /path/to/your/project -e .py, .java, .c, .cpp, .js, .html, .css, .txt
 ```
 

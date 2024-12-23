@@ -22,14 +22,12 @@
 ## Как использовать
 
 1. Основное использование:
-```
-bash
+```bash
 python invalid_char_checker.py /path/to/your/project
 ```
 
 2. Укажите тип файла:
-```
-bash
+```bash
 python invalid_char_checker.py /path/to/your/project -e .py, .java, .c, .cpp, .js, .html, .css, .txt
 ```
 

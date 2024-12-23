@@ -22,14 +22,12 @@
 ## 사용 방법
 
 1. 기본 사용법:
-```
-bash
+```bash
 python invalid_char_checker.py /path/to/your/project
 ```
 
 2. 파일 유형을 지정합니다:
-```
-bash
+```bash
 python invalid_char_checker.py /path/to/your/project -e .py, .java, .c, .cpp, .js, .html, .css, .txt
 ```
 
