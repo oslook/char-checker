@@ -12,6 +12,10 @@ VALID_CHARS = set(
     " \t\n\r\0\b\x0c"
     # Common punctuation symbols
     ",.;:!?()[]{}'\"`+-*/%=<>|&@#$^~\\_"
+    # Chinese punctuation symbols
+    "！？，。《》（）【】『』「」﹃﹄〔〕［］｛｝：；"
+    # Japanese punctuation symbols
+    "。、・「」『』【】〜〝〞〟〰〡〢〣〤〥〦〧〨〩〪〭〮〯〫〬〰〱〲〳〴〵〶〷〸〹〺〻〼〽〾〿"
 )
 
 def is_valid_char(char):
@@ -90,8 +94,8 @@ def parse_arguments():
     )
     parser.add_argument(
         '-e', '--extensions',
-        default='.py,.java,.c,.cpp,.js,.html,.css,.txt',
-        help='File extensions to be checked, separated by commas (default: .py,.java,.c,.cpp,.js,.html,.css,.txt)'
+        default='.py,.java,.c,.cpp,.js,.html,.css,.txt,.md',
+        help='File extensions to be checked, separated by commas (default: .py,.java,.c,.cpp,.js,.html,.css,.txt,.md)'
     )
     return parser.parse_args()
 
