@@ -3,6 +3,7 @@
 import os
 import argparse
 import sys
+import datetime
 
 # valid chars
 VALID_CHARS = set(
@@ -15,7 +16,12 @@ VALID_CHARS = set(
     # Chinese punctuation symbols
     "！？，。《》（）【】『』「」﹃﹄〔〕［］｛｝：；"
     # Japanese punctuation symbols
-    "。、・「」『』【】〜〝〞〟〰〡〢〣〤〥〦〧〨〩〪〭〮〯〫〬〰〱〲〳〴〵〶〷〸〹〺〻〼〽〾〿"
+    "。、・「」『』【】〜〝〞〟〰〡〢〣〤〥〦〧〨〩〪〭〮〯〫〬〰〱〲〳〴〵〶〷〸〹〺〻〼〽〾〿"
+    # Vietnamese diacritical marks
+    "áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđ"
+    "ÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỴĐ"
+    # Russian letters
+    "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
 )
 
 def is_valid_char(char):
@@ -46,47 +52,75 @@ def is_valid_char(char):
     if (0x0400 <= code_point <= 0x04FF) or (0x0500 <= code_point <= 0x052F):
         return True
 
+    # Check the range of Vietnamese characters
+    if (0x1EA0 <= code_point <= 0x1EF9):
+        return True
+
     # Check the range of Emoji
     if (0x1F600 <= code_point <= 0x1F64F) or (0x1F300 <= code_point <= 0x1F5FF) or (0x1F900 <= code_point <= 0x1F9FF) or (0x1FA70 <= code_point <= 0x1FAFF) or (0x1F400 <= code_point <= 0x1F4FF):
         return True
     
     return False
 
-def check_file(file_path):
+def check_file(file_path, report_file=None):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
+            has_invalid_chars = False
+            report = []
             for line_number, line in enumerate(file, start=1):
                 for char_index, char in enumerate(line):
                     if not is_valid_char(char):
-                        print(f"Invalid character found in {file_path} at line {line_number}, column {char_index + 1}:")
-                        print(f"Character: {char}")
-                        print(f"Unicode: U+{ord(char):04X}")
-                        print(f"Decimal: {ord(char)}")
-                        print("-" * 50)
+                        has_invalid_chars = True
+                        message = [
+                            f"Invalid character found in {file_path} at line {line_number}, column {char_index + 1}:",
+                            f"Character: {char}",
+                            f"Unicode: U+{ord(char):04X}",
+                            f"Decimal: {ord(char)}",
+                            "-" * 50
+                        ]
+                        if report_file:
+                            report.extend(message)
+                        print('\n'.join(message))
+            
+            if report_file and has_invalid_chars:
+                report_file.write('\n'.join(report) + '\n')
+                
     except UnicodeDecodeError:
-        print(f"Error: Unable to read {file_path} - File encoding is not UTF-8")
+        error_msg = f"Error: Unable to read {file_path} - File encoding is not UTF-8"
+        print(error_msg)
+        if report_file:
+            report_file.write(error_msg + '\n')
     except Exception as e:
-        print(f"Error processing {file_path}: {str(e)}")
+        error_msg = f"Error processing {file_path}: {str(e)}"
+        print(error_msg)
+        if report_file:
+            report_file.write(error_msg + '\n')
 
 def check_directory(directory, file_extensions):
     if not os.path.exists(directory):
         print(f"Error: Directory '{directory}' does not exist")
         sys.exit(1)
-        
-    found_files = False
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if file.endswith(tuple(file_extensions)):
-                found_files = True
-                file_path = os.path.join(root, file)
-                check_file(file_path)
     
-    if not found_files:
-        print(f"No matching files found in '{directory}'")
+    report_path = os.path.join(directory, 'invalid_chars_report.txt')
+    with open(report_path, 'w', encoding='utf-8') as report_file:
+        report_file.write(f"Invalid Characters Report\nDate: {datetime.datetime.now()}\n{'-' * 50}\n")
+        
+        found_files = False
+        for root, _, files in os.walk(directory):
+            for file in files:
+                if file.endswith(tuple(file_extensions)):
+                    found_files = True
+                    file_path = os.path.join(root, file)
+                    check_file(file_path, report_file)
+        
+        if not found_files:
+            message = f"No matching files found in '{directory}'"
+            print(message)
+            report_file.write(message)
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description='Detect invalid characters in code files, support Chinese, Japanese, Korean and Russian.'
+        description='Detect invalid characters in code files, support Chinese, Japanese, Korean, Vietnamese and Russian.'
     )
     parser.add_argument(
         'directory',
@@ -94,12 +128,13 @@ def parse_arguments():
     )
     parser.add_argument(
         '-e', '--extensions',
-        default='.py,.java,.c,.cpp,.js,.html,.css,.txt,.md',
-        help='File extensions to be checked, separated by commas (default: .py,.java,.c,.cpp,.js,.html,.css,.txt,.md)'
+        nargs='+',
+        default=['.py','.java','.c','.cpp','.js','.html','.css','.txt','.md'],
+        help='File extensions to be checked (default: .py .java .c .cpp .js .html .css .txt .md)'
     )
     return parser.parse_args()
 
 if __name__ == "__main__":
     args = parse_arguments()
-    file_extensions = args.extensions.split(',')
+    file_extensions = args.extensions
     check_directory(args.directory, file_extensions)
