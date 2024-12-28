@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Invalid Character Checker</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 20px;
+			}
+			.result {
+				margin-top: 20px;
+				padding: 10px;
+				border: 1px solid #ccc;
+			}
+			.error {
+				color: red;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Invalid Character Checker Tool</h1>
+
+		<form id="checkForm">
+			<div>
+				<label for="text">Enter text to check:</label><br />
+				<textarea id="text" rows="10" cols="80"></textarea>
+			</div>
+			<button type="submit">Check</button>
+		</form>
+
+		<div id="result" class="result"></div>
+
+		<script>
+			function isValidChar(char) {
+				const validChars = new Set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' + ' \t\n\r\0\b\x0c' + ',.;:!?()[]{}\'"`+-*/%=<>|&@#$^~\\_' + '！？，。《》（）【】『』「」﹃﹄〔〕［］｛｝：；' + '。、・「」『』【】〜〝〞〟〰〡〢〣〤〥〦〧〨〩〪〭〮〯〫〬〰〱〲〳〴〵〶〷〸〹〺〻〼〽〾〿' + 'áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđ' + 'ÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỴĐ');
+
+				if (validChars.has(char)) return true;
+
+				const code = char.charCodeAt(0);
+
+				// Check Unicode ranges
+				return (
+					(0x4e00 <= code && code <= 0x9fff) || // Chinese characters
+					(0x3040 <= code && code <= 0x309f) || // Hiragana
+					(0x30a0 <= code && code <= 0x30ff) || // Katakana
+					(0xac00 <= code && code <= 0xd7af) || // Korean
+					(0x0400 <= code && code <= 0x052f) || // Cyrillic
+					(0x1ea0 <= code && code <= 0x1ef9) || // Vietnamese
+					(0x1f600 <= code && code <= 0x1f64f) || // Emoji
+					(0x2100 <= code && code <= 0x214f) || // Special symbols
+					(0x2200 <= code && code <= 0x22ff) // Mathematical
+				);
+			}
+
+			document.getElementById('checkForm').addEventListener('submit', function (e) {
+				e.preventDefault();
+				const text = document.getElementById('text').value;
+				const resultDiv = document.getElementById('result');
+				let output = '';
+				let hasInvalidChars = false;
+
+				for (let i = 0; i < text.length; i++) {
+					const char = text[i];
+					if (!isValidChar(char)) {
+						hasInvalidChars = true;
+						output += `<p class="error">Invalid character found at position ${i + 1}:<br>`;
+						output += `Character: ${char}<br>`;
+						output += `Unicode: U+${char.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0')}<br>`;
+						output += `Decimal: ${char.charCodeAt(0)}</p>`;
+					}
+				}
+
+				if (!hasInvalidChars) {
+					output = '<p>No invalid characters found.</p>';
+				}
+
+				resultDiv.innerHTML = output;
+			});
+		</script>
+	</body>
+</html>
