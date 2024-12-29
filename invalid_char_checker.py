@@ -22,6 +22,10 @@ VALID_CHARS = set(
     "ÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỴĐ"
     # Russian letters
     "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+    # Special characters
+    "™℠℗℘℅℆℄℀℁℃℉℈℔№℗℞℟℠℡™℣"
+    # Mathematical symbols
+    "∀∁∂∃∄∅∆∇∈∉∊∋∌∍∎∏∐∑−∓∔∕∖∗∘∙√∛∜∝∞∟∠∡∢∣∤∥∦∧∨∩∪∫∬∭∮∯∰∱∲∳∴∵∶∷∸∹∺∻∼∽∾∿≀≁≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊂⊃⊄⊅⊆⊇⊈⊉⊊⊋⊌⊍⊎⊏⊐⊑⊒⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊣⊤⊥⊦⊧⊨⊩⊪⊫⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊸⊹⊺⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⋐⋑⋒⋓⋔⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋮⋯⋰⋱⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿"
 )
 
 def is_valid_char(char):
@@ -60,6 +64,22 @@ def is_valid_char(char):
     if (0x1F600 <= code_point <= 0x1F64F) or (0x1F300 <= code_point <= 0x1F5FF) or (0x1F900 <= code_point <= 0x1F9FF) or (0x1FA70 <= code_point <= 0x1FAFF) or (0x1F400 <= code_point <= 0x1F4FF):
         return True
     
+    # Check for special characters
+    if (0x2100 <= code_point <= 0x214F):  # Letterlike Symbols
+        return True
+        
+    # Check for mathematical operators
+    if (0x2200 <= code_point <= 0x22FF):  # Mathematical Operators
+        return True
+    
+    # Check for arrows
+    if (0x2190 <= code_point <= 0x21FF):  # Arrows
+        return True
+    
+    # Check for geometric shapes
+    if (0x25A0 <= code_point <= 0x25FF):  # Geometric Shapes
+        return True
+        
     return False
 
 def check_file(file_path, report_file=None):
@@ -129,8 +149,8 @@ def parse_arguments():
     parser.add_argument(
         '-e', '--extensions',
         nargs='+',
-        default=['.py','.java','.c','.cpp','.js','.html','.css','.txt','.md'],
-        help='File extensions to be checked (default: .py .java .c .cpp .js .html .css .txt .md)'
+        default=['.py','.java','.c','.cpp','.js','.html','.css','.txt','.md','.json','.xml','.yaml','.yml','.ini','.conf','.sh','.bat','.ps1'],
+        help='File extensions to be checked (default: .py .java .c .cpp .js .html .css .txt .md .json .xml .yaml .yml .ini .conf .sh .bat .ps1)'
     )
     return parser.parse_args()
 
